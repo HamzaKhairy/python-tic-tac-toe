@@ -8,15 +8,16 @@ import random
 CurrentPlayer = "X"
 AgainChoice = " "
 Player1, Player2 = "X", "O"
-GamesPlayed, position = 0, 0
+GamesPlayed, position, playcount = 0, 0, 0
 Player1Score, Player2Score, TieGames = 0, 0, 0
 Valid, PlayAgain, FirstPlay = True, True, True
 GameEnd = False
 
 # Initialize the empty board, index 0 is empty as references to the list range from 1 to 9.
-Board = ["", "*", "*", "*", "*", "*", "*", "*", "*", "*"]
+Board = ["", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
 # 10 motivational phrases to be displayed at random in single player mode.
-Phrases = ["Nice move!", "Smart", "Good job", "Nice!", "good move", "Smart move!", "Good one", "Well played", "", ""]
+Phrases = ["Nice move!", "Smart", "Good job", "Nice!", "good move", "Smart move!", "Good one", "Well played",
+           "clever", ""]
 
 
 # Game introduction & mode selection (single player or multiplayer).
@@ -35,7 +36,6 @@ def intro():
     print("\nFirst game starts now, good luck!\n")
 
 
-# Displays the game's board.
 def display_board():
     print("\n" + Board[1] + " | " + Board[2] + " | " + Board[3] + "\n--+---+--")
     print(Board[4] + " | " + Board[5] + " | " + Board[6] + "\n--+---+--")
@@ -45,12 +45,11 @@ def display_board():
 # Handles the pc's move for single player mode.
 def pc_move():
     global position
-    while Board[position] != "*":
+    while Board[position] != "-":
         position = int(random.randint(1, 9))
     Board[position] = "O"
 
 
-# Flips the current player from X to O.
 def turn_flip():
     global CurrentPlayer
     if CurrentPlayer == "X":
@@ -59,33 +58,34 @@ def turn_flip():
         CurrentPlayer = "X"
 
 
-# Checks for winning conditions.
+# Checks for winning conditions after the 4th move.
 def check_game_status():
-    global GameEnd, TieGames
-    if ("*" != Board[1] == Board[2] == Board[3]) or ("*" != Board[4] == Board[5] == Board[6]) \
-            or ("*" != Board[7] == Board[8] == Board[9]):
-        if (CurrentPlayer == "O") and (Player2 == "pc"):
-            print(CurrentPlayer, "has made a horizontal win. You lose :(")
-        else:
-            print(CurrentPlayer, "has filled a horizontal row. Congratulations, you won!")
-        update_score()
+    if playcount > 3:
+        global GameEnd, TieGames
+        if ("-" != Board[1] == Board[2] == Board[3]) or ("-" != Board[4] == Board[5] == Board[6]) \
+                or ("-" != Board[7] == Board[8] == Board[9]):
+            if (CurrentPlayer == "O") and (Player2 == "pc"):
+                print(CurrentPlayer, "has made a horizontal win. You lose :(")
+            else:
+                print(CurrentPlayer, "has filled a horizontal row. Congratulations, you won!")
+            update_score()
 
-    elif ("*" != Board[1] == Board[4] == Board[7]) or ("*" != Board[2] == Board[5] == Board[8]) \
-            or ("*" != Board[3] == Board[6] == Board[9]):
-        if (CurrentPlayer == "O") and (Player2 == "pc"):
-            print(CurrentPlayer, "has made a vertical win. You lose :(")
-        else:
-            print(CurrentPlayer, "has filled a vertical column. Congratulations, you won!")
-        update_score()
+        elif ("-" != Board[1] == Board[4] == Board[7]) or ("-" != Board[2] == Board[5] == Board[8]) \
+                or ("-" != Board[3] == Board[6] == Board[9]):
+            if (CurrentPlayer == "O") and (Player2 == "pc"):
+                print(CurrentPlayer, "has made a vertical win. You lose :(")
+            else:
+                print(CurrentPlayer, "has filled a vertical column. Congratulations, you won!")
+            update_score()
 
-    elif ("*" != Board[1] == Board[5] == Board[9]) or ("*" != Board[7] == Board[5] == Board[3]):
-        if (CurrentPlayer == "O") and (Player2 == "pc"):
-            print(CurrentPlayer, "has made a diagonal win. You lose :(")
-        else:
-            print(CurrentPlayer, " has filled a diagonal line. Congratulations, you won!")
-        update_score()
+        elif ("-" != Board[1] == Board[5] == Board[9]) or ("-" != Board[7] == Board[5] == Board[3]):
+            if (CurrentPlayer == "O") and (Player2 == "pc"):
+                print(CurrentPlayer, "has made a diagonal win. You lose :(")
+            else:
+                print(CurrentPlayer, " has filled a diagonal line. Congratulations, you won!")
+            update_score()
 
-    elif "*" not in Board:
+    elif "-" not in Board:
         print("     It's a tie!")
         TieGames += 1
         GameEnd = True
@@ -96,15 +96,14 @@ def validate_position():
     global position
     while (position > 9) or (position < 1):
         position = int(input("Invalid! Please input an integer from 1 to 9: "))
-    while Board[position] != "*":
+    while Board[position] != "-":
         position = int(input("Occupied! Please select an empty position: "))
     Board[position] = CurrentPlayer
 
 
 # Handles the plays that happen each turn for both game modes.
 def turns():
-    global FirstPlay, CurrentPlayer, position
-    # Special message to take the first move.
+    global FirstPlay, CurrentPlayer, position, playcount
     if FirstPlay:
         if (CurrentPlayer == "O") and (Player2 == "pc"):
             print("O goes first")
@@ -126,6 +125,8 @@ def turns():
         position = input(CurrentPlayer + "'s turn: ")
         position = int(position)
         validate_position()
+    playcount += 1
+    print(playcount)
     display_board()
     check_game_status()
 
@@ -138,7 +139,6 @@ def display_scoreboard():
     print("Games Played:", GamesPlayed, "| Tied Games:", TieGames, "\n------")
 
 
-# Updates the score at the end of each game.
 def update_score():
     global GameEnd
     global Player1Score, Player2Score
@@ -154,8 +154,11 @@ def new_game():
     global AgainChoice, PlayAgain, FirstPlay, Board, GameEnd
     AgainChoice = input("Type 'Y' to play again, or anything else to exit: ")
     if AgainChoice.upper() == "Y":
-        Board = ["", "*", "*", "*", "*", "*", "*", "*", "*", "*"]
+        Board = ["", "-", "-", "-", "-", "-", "-", "-", "-", "-"]
         GameEnd, FirstPlay = False, True
+        # Makes the winning player (the one who moved last) start first in the new game.
+        turn_flip()
+
         if Player2 != "pc":
             print("\nGame", (GamesPlayed + 1), "starting now. Good luck " + Player1 + " and " + Player2 + "!\n")
         else:
