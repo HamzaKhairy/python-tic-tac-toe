@@ -36,22 +36,38 @@ def display_board():
     print(Board[7] + " | " + Board[8] + " | " + Board[9] + "\n")
 
 
-def turn():
+def turns():
     global FirstPlay, CurrentPlayer, position
     if FirstPlay:
-        position = input(CurrentPlayer + " goes first: ")
+        if (CurrentPlayer == "O") and (Player2 == "pc"):
+            print("O goes first")
+            pc_move()
+        else:
+            position = input(CurrentPlayer + " goes first: ")
+            position = int(position)
+            validate_position()
+        display_board()
+        FirstPlay = False
+        turn_flip()
+
+    if (CurrentPlayer == "O") and (Player2 == "pc"):
+        print("O's play:")
+        pc_move()
+    else:
+        position = input(CurrentPlayer + "'s turn: ")
         position = int(position)
         validate_position()
-        display_board()
-        turn_flip()
-        FirstPlay = False
-
-    position = input(CurrentPlayer + "'s turn: ")
-    position = int(position)
-    validate_position()
     display_board()
-    print(Phrases[random.randint(0, 6)], "\n")
+    if Player2 == "pc":
+        print(Phrases[random.randint(0, 6)], "\n")
     check_game_status()
+
+
+def pc_move():
+    global position
+    while Board[position] != "*":
+        position = int(random.randint(1, 9))
+    Board[position] = "O"
 
 
 def validate_position():
@@ -67,15 +83,24 @@ def check_game_status():
     global GameEnd, TieGames
     # Checking for a horizontal win
     if ("*" != Board[1] == Board[2] == Board[3]) or ("*" != Board[4] == Board[5] == Board[6]) or ("*" != Board[7] == Board[8] == Board[9]):
-        print(CurrentPlayer, "has made a horizontal win. Congratulations!")
+        if (CurrentPlayer == "O") and (Player2 == "pc"):
+            print(CurrentPlayer, "has made a horizontal win. You lose :(")
+        else:
+            print(CurrentPlayer, "has made a horizontal win. Congratulations, you won!")
         update_score()
     # Checking for a vertical win
     elif ("*" != Board[1] == Board[4] == Board[7]) or ("*" != Board[2] == Board[5] == Board[8]) or ("*" != Board[3] == Board[6] == Board[9]):
-        print(CurrentPlayer, "has made a vertical win. Congratulations!")
+        if (CurrentPlayer == "O") and (Player2 == "pc"):
+            print(CurrentPlayer, "has made a vertical win. You lose :(")
+        else:
+            print(CurrentPlayer, "has made a vertical win. Congratulations, you won!")
         update_score()
     # Checking for a diagonal win
     elif ("*" != Board[1] == Board[5] == Board[9]) or ("*" != Board[7] == Board[5] == Board[3]):
-        print(CurrentPlayer, " has made a diagonal win. Congratulations!")
+        if (CurrentPlayer == "O") and (Player2 == "pc"):
+            print(CurrentPlayer, "has made a diagonal win. You lose :(")
+        else:
+            print(CurrentPlayer, " has made a diagonal win. Congratulations, you won!")
         update_score()
     elif "*" not in Board:
         print("     It's a tie!")
@@ -128,7 +153,7 @@ intro()
 while PlayAgain:
     display_board()
     while not GameEnd:
-        turn()
+        turns()
         turn_flip()
     display_scoreboard()
     new_game()
