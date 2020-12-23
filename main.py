@@ -4,16 +4,15 @@
 # This program is a simple text-based tic-tac-toe game.
 
 import random
-
 CurrentPlayer = "X"
 AgainChoice = " "
 Player1, Player2 = "X", "O"
 GamesPlayed, position = 0, 0
 Player1Score, Player2Score, TieGames = 0, 0, 0
-PlayAgain, Valid = True, True
+Valid, PlayAgain, FirstPlay = True, True, True
 GameEnd = False
 Board = ["", "*", "*", "*", "*", "*", "*", "*", "*", "*"]
-Phrases = ["Nice move!", "Smart", "Good job", "Nice!", "good move"]
+Phrases = ["Nice move!", "Smart", "Good job", "Nice!", "good move", "Smart move!", "Good one"]
 
 
 def intro():
@@ -28,28 +27,40 @@ def intro():
 
     Player1 = input("Enter Player 1's name (X): ")
     Player2 = input("\n* Type 'pc' for single player * \nEnter Player 2's name (O): ")
-    print("\nThe first game starts now, good luck!\n")
+    print("\nFirst game starts now, good luck!\n")
 
 
 def display_board():
-    print(Board[1] + " | " + Board[2] + " | " + Board[3] + "\n--+---+--")
+    print("\n" + Board[1] + " | " + Board[2] + " | " + Board[3] + "\n--+---+--")
     print(Board[4] + " | " + Board[5] + " | " + Board[6] + "\n--+---+--")
     print(Board[7] + " | " + Board[8] + " | " + Board[9] + "\n")
 
 
 def turn():
-    global CurrentPlayer, position
+    global FirstPlay, CurrentPlayer, position
+    if FirstPlay:
+        position = input(CurrentPlayer + " goes first: ")
+        position = int(position)
+        validate_position()
+        display_board()
+        turn_flip()
+        FirstPlay = False
+
     position = input(CurrentPlayer + "'s turn: ")
     position = int(position)
+    validate_position()
+    display_board()
+    print(Phrases[random.randint(0, 6)], "\n")
+    check_game_status()
+
+
+def validate_position():
+    global position
     while (position > 9) or (position < 1):
         position = int(input("Invalid! Please input an integer from 1 to 9: "))
     while Board[position] != "*":
         position = int(input("Occupied! Please select an empty position: "))
-    check_game_status()
     Board[position] = CurrentPlayer
-    print("\n")
-    display_board()
-    print(Phrases[random.randint(0, 4)], "\n")
 
 
 def check_game_status():
@@ -85,7 +96,7 @@ def display_scoreboard():
     GamesPlayed = Player1Score + Player2Score + TieGames
     print("------------------------- \n    ~ Scoreboard ~")
     print("|", Player1, ":", Player1Score, "||", Player2, ":", Player2Score, "|")
-    print("Games Played:", GamesPlayed, "| \n Tied Games:", TieGames, "\n------")
+    print("Games Played:", GamesPlayed, "| Tied Games:", TieGames, "\n------")
 
 
 def update_score():
@@ -98,22 +109,19 @@ def update_score():
     GameEnd = True
 
 
-def play_again():
-    global PlayAgain, Board, GameEnd, AgainChoice
-    Board = ["", "*", "*", "*", "*", "*", "*", "*", "*", "*"]
-
-    AgainChoice = input("Do you want to play again? (Y/N): ")
-
-    while (AgainChoice != "N") or (AgainChoice != "Y"):
-        AgainChoice = input("Please input ('Y' or 'N'): ")
-
-    if AgainChoice == "N":
-        PlayAgain = False
-        print("\nThank you for playing, I hope you enjoyed :)")
+def new_game():
+    global AgainChoice, PlayAgain, FirstPlay, Board, GameEnd
+    AgainChoice = input("Type 'Y' to play again, or anything else to exit: ")
     if AgainChoice == "Y":
-        PlayAgain = True
-        GameEnd = False
-        print("Another game is starting, good luck!\n------------------")
+        Board = ["", "*", "*", "*", "*", "*", "*", "*", "*", "*"]
+        GameEnd, FirstPlay = False, True
+        if Player2 != "pc":
+            print("\nGame", (GamesPlayed + 1), "starting now. Good luck " + Player1 + " and " + Player2 + "!\n")
+        else:
+            print("\nGame", (GamesPlayed + 1), "starting now. Good luck " + Player1 + "!\n")
+    else:
+        PlayAgain = False
+        print("Goodbye! I hope you enjoyed.")
 
 
 intro()
@@ -121,7 +129,6 @@ while PlayAgain:
     display_board()
     while not GameEnd:
         turn()
-        check_game_status()
         turn_flip()
     display_scoreboard()
-    play_again()
+    new_game()
