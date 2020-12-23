@@ -1,8 +1,7 @@
-# main.py
+# File: main.py
+# Date: 21-Dec-20
 # HamzaKhairy/python-tic-tac-toe
-# Start: 21-Dec-20
 # This program is a simple text-based tic-tac-toe game. Playable in both single player or multiplayer mode.
-
 
 # Import the random module & Initialize variables.
 import random
@@ -16,8 +15,8 @@ GameEnd = False
 
 # Initialize the empty board, index 0 is empty as references to the list range from 1 to 9.
 Board = ["", "*", "*", "*", "*", "*", "*", "*", "*", "*"]
-# Motivational phrases to be displayed at random in single player mode.
-Phrases = ["Nice move!", "Smart", "Good job", "Nice!", "good move", "Smart move!", "Good one"]
+# 10 motivational phrases to be displayed at random in single player mode.
+Phrases = ["Nice move!", "Smart", "Good job", "Nice!", "good move", "Smart move!", "Good one", "Well played", "", ""]
 
 
 # Game introduction & mode selection (single player or multiplayer).
@@ -63,7 +62,6 @@ def turn_flip():
 # Checks for winning conditions.
 def check_game_status():
     global GameEnd, TieGames
-    # Checking for a horizontal win
     if ("*" != Board[1] == Board[2] == Board[3]) or ("*" != Board[4] == Board[5] == Board[6]) \
             or ("*" != Board[7] == Board[8] == Board[9]):
         if (CurrentPlayer == "O") and (Player2 == "pc"):
@@ -71,7 +69,7 @@ def check_game_status():
         else:
             print(CurrentPlayer, "has filled a horizontal row. Congratulations, you won!")
         update_score()
-    # Checking for a vertical win
+
     elif ("*" != Board[1] == Board[4] == Board[7]) or ("*" != Board[2] == Board[5] == Board[8]) \
             or ("*" != Board[3] == Board[6] == Board[9]):
         if (CurrentPlayer == "O") and (Player2 == "pc"):
@@ -79,13 +77,14 @@ def check_game_status():
         else:
             print(CurrentPlayer, "has filled a vertical column. Congratulations, you won!")
         update_score()
-    # Checking for a diagonal win
+
     elif ("*" != Board[1] == Board[5] == Board[9]) or ("*" != Board[7] == Board[5] == Board[3]):
         if (CurrentPlayer == "O") and (Player2 == "pc"):
             print(CurrentPlayer, "has made a diagonal win. You lose :(")
         else:
             print(CurrentPlayer, " has filled a diagonal line. Congratulations, you won!")
         update_score()
+
     elif "*" not in Board:
         print("     It's a tie!")
         TieGames += 1
@@ -120,7 +119,7 @@ def turns():
 
     if (CurrentPlayer == "O") and (Player2 == "pc"):
         if Player2 == "pc":
-            print(Phrases[random.randint(0, 6)], "\n")
+            print(Phrases[random.randint(0, 9)], "\n")
         print("O's play:")
         pc_move()
     else:
@@ -154,7 +153,7 @@ def update_score():
 def new_game():
     global AgainChoice, PlayAgain, FirstPlay, Board, GameEnd
     AgainChoice = input("Type 'Y' to play again, or anything else to exit: ")
-    if AgainChoice == "Y":
+    if AgainChoice.upper() == "Y":
         Board = ["", "*", "*", "*", "*", "*", "*", "*", "*", "*"]
         GameEnd, FirstPlay = False, True
         if Player2 != "pc":
